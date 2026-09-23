@@ -1,7 +1,7 @@
 import streamlit as st
 import requests
 
-# ページ全体のスタイリッシュな設定
+# ページ全体の設定
 st.set_page_config(
     page_title="Rakuten Luxe Select | 智能ポイ活カタログ", 
     page_icon="✨", 
@@ -11,7 +11,6 @@ st.set_page_config(
 # --- スタイリッシュ化のためのカスタムCSS ---
 st.markdown("""
 <style>
-    /* 全体のフォントと背景の洗練 */
     .main-title {
         font-size: 2.2rem;
         font-weight: 800;
@@ -25,7 +24,6 @@ st.markdown("""
         font-size: 0.95rem;
         margin-bottom: 2rem;
     }
-    /* 商品カードのモダンな装飾 */
     .product-card {
         background: #ffffff;
         padding: 1.2rem;
@@ -46,34 +44,35 @@ st.markdown("""
 st.markdown('<p class="main-title">✨ Rakuten Luxe Select</p>', unsafe_allow_html=True)
 st.markdown('<p class="sub-title">トレンドと欲しいモノをスマートに繋ぐ、次世代アフィリエイト・カタログ</p>', unsafe_allow_html=True)
 
-# --- セッション状態の初期化（スリープ対策・データ保持） ---
-if "searched" not in st.session_state:
-    st.session_state.searched = False
-
-# サイドバー：認証・設定情報（すっきりと折りたたみ式に）
+# サイドバー：認証・設定情報
 with st.sidebar:
     st.header("⚙️ システム設定")
     app_id = st.text_input("アプリケーションID", value="7e0200d6-45fe-4b28-be71-8711baaa5e7c", type="password")
     affiliate_id = st.text_input("アフィリエイトID", value="104c3008.67310065.104c3009.a677faf7")
-    st.info("💡 IDは安全に保持されています。そのままお使いいただけます。")
+    st.info("💡 IDは安全に保持されています。")
 
 # メイン検索エリア
 st.markdown("### 🔍 スマートアイテム検索")
-keyword = st.text_input("気になるキーワードを入力してください（例：北海道 鮮魚、高級 プロテイン、おしゃれ キャンプ）", "北海道 スイーツ")
+keyword = st.text_input("気になるキーワードを入力してください（例：北海道 スイーツ、Xiaomi、プロテイン）", "北海道 スイーツ")
 
 col1, col2 = st.columns([3, 1])
 with col1:
     search_btn = st.button("✨ カタログを生成する", use_container_width=True)
 
 if search_btn:
-    if not app_id or not affiliate_id:
+    # 入力値の前後にある余分なスペースを完全に削除（400エラー対策）
+    clean_app_id = app_id.strip() if app_id else ""
+    clean_aff_id = affiliate_id.strip() if affiliate_id else ""
+    clean_keyword = keyword.strip() if keyword else ""
+
+    if not clean_app_id or not clean_aff_id:
         st.warning("アプリケーションIDとアフィリエイトIDを確認してください。")
     else:
         url = "https://app.rakuten.co.jp/services/api/IchibaItem/Search/20220601"
         params = {
-            "applicationId": app_id,
-            "affiliateId": affiliate_id,
-            "keyword": keyword,
+            "applicationId": clean_app_id,
+            "affiliateId": clean_aff_id,
+            "keyword": clean_keyword,
             "format": "json",
             "hits": 6
         }
@@ -88,7 +87,7 @@ if search_btn:
                     if not items:
                         st.info("該当するアイテムが見つかりませんでした。別のキーワードでお試しください。")
                     else:
-                        st.success(f"「{keyword}」の厳選アイテムをピックアップしました！")
+                        st.success(f"「{clean_keyword}」の厳選アイテムをピックアップしました！")
                         st.markdown("---")
                         
                         for item_wrapper in items:
@@ -98,7 +97,6 @@ if search_btn:
                             item_url = item.get("affiliateUrl") or item["itemUrl"]
                             image_url = item["mediumImageUrls"][0]["imageUrl"] if item["mediumImageUrls"] else ""
                             
-                            # 洗練されたカード形式で出力
                             st.markdown(f"""
                             <div class="product-card">
                                 <table>
@@ -119,7 +117,7 @@ if search_btn:
                             """, unsafe_allow_html=True)
                             
                 else:
-                    st.error(f"データの取得に失敗しました（コード: {res.status_code}）")
+                    st.error(f"データの取得に失敗しました（コード: {res.status_code}） - 入力されたIDやキーワードをご確認ください。")
             except Exception as e:
                 st.error(f"通信エラーが発生しました: {e}")
 
