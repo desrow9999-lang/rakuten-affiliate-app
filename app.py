@@ -44,12 +44,14 @@ st.markdown("""
 st.markdown('<p class="main-title">✨ 楽天ラグジュアリーセレクト</p>', unsafe_allow_html=True)
 st.markdown('<p class="sub-title">トレンドと欲しいモノをスマートに繋ぐ、次世代アフィリエイト・カタログ</p>', unsafe_allow_html=True)
 
-# サイドバー：認証・設定情報（新しく取得したIDを初期値として設定）
+# サイドバー：認証・設定情報
 with st.sidebar:
     st.header("⚙️ システム設定")
-    app_id = st.text_input("アプリケーションID", value="cd4566ea-c2e9-462d-8e63-01b1eec844b8", type="password")
+    # アプリケーションIDとアクセスキーの両方を設定できるように変更
+    app_id = st.text_input("アプリケーションID", value="cd4566ea-c2e9-462d-8e63-01b1eec844b8")
+    access_key = st.text_input("アクセスキー (pk_...)", value="pk_ycMlFlKlMDuHdYC70sJ8tmBzQMaOcmjSoa6zuUJlfdV", type="password")
     affiliate_id = st.text_input("アフィリエイトID", value="104c3008.67310065.104c3009.a677faf7")
-    st.info("💡 IDは安全に保持されています。")
+    st.info("💡 楽天Developersで発行された最新のキーを設定しています。")
 
 # メイン検索エリア
 st.markdown("### 🔍 スマートアイテム検索")
@@ -60,15 +62,15 @@ with col1:
     search_btn = st.button("✨ カタログを生成する", use_container_width=True)
 
 if search_btn:
-    # 入力値の前後にある余分なスペースを完全に削除
     clean_app_id = app_id.strip() if app_id else ""
+    clean_access_key = access_key.strip() if access_key else ""
     clean_aff_id = affiliate_id.strip() if affiliate_id else ""
     clean_keyword = keyword.strip() if keyword else ""
 
     if not clean_app_id or not clean_aff_id:
         st.warning("アプリケーションIDとアフィリエイトIDを入力してください。")
     else:
-        # 最新のAPIエンドポイント
+        # エンドポイントとパラメータの設定（アクセスキーがある場合はヘッダーまたはパラメータに付与）
         url = "https://app.rakuten.co.jp/services/api/IchibaItem/Search/20220601"
         params = {
             "applicationId": clean_app_id,
@@ -78,9 +80,16 @@ if search_btn:
             "hits": 6
         }
         
+        # アクセスキーが入力されている場合はヘッダーまたは認証用に追加
+        headers = {}
+        if clean_access_key:
+            headers["Authorization"] = f"Bearer {clean_access_key}"
+            # 一部の新しいAPI仕様では accessKey パラメータを要求する場合もあるため両方に対応
+            params["accessKey"] = clean_access_key
+
         with st.spinner("🌟 楽天のトレンドデータを同期中..."):
             try:
-                res = requests.get(url, params=params)
+                res = requests.get(url, params=params, headers=headers)
                 
                 if res.status_code == 200:
                     data = res.json()
