@@ -47,11 +47,10 @@ st.markdown('<p class="sub-title">トレンドと欲しいモノをスマート�
 # サイドバー：認証・設定情報
 with st.sidebar:
     st.header("⚙️ システム設定")
-    # アプリケーションIDとアクセスキーの両方を設定できるように変更
     app_id = st.text_input("アプリケーションID", value="cd4566ea-c2e9-462d-8e63-01b1eec844b8")
     access_key = st.text_input("アクセスキー (pk_...)", value="pk_ycMlFlKlMDuHdYC70sJ8tmBzQMaOcmjSoa6zuUJlfdV", type="password")
     affiliate_id = st.text_input("アフィリエイトID", value="104c3008.67310065.104c3009.a677faf7")
-    st.info("💡 楽天Developersで発行された最新のキーを設定しています。")
+    st.info("💡 最新の認証キーを設定済みです。")
 
 # メイン検索エリア
 st.markdown("### 🔍 スマートアイテム検索")
@@ -70,26 +69,21 @@ if search_btn:
     if not clean_app_id or not clean_aff_id:
         st.warning("アプリケーションIDとアフィリエイトIDを入力してください。")
     else:
-        # エンドポイントとパラメータの設定（アクセスキーがある場合はヘッダーまたはパラメータに付与）
         url = "https://app.rakuten.co.jp/services/api/IchibaItem/Search/20220601"
+        
+        # 楽天の新しい仕様に合わせてパラメータに applicationId, accessKey, affiliateId をすべて渡す
         params = {
             "applicationId": clean_app_id,
+            "accessKey": clean_access_key,
             "affiliateId": clean_aff_id,
             "keyword": clean_keyword,
             "format": "json",
             "hits": 6
         }
-        
-        # アクセスキーが入力されている場合はヘッダーまたは認証用に追加
-        headers = {}
-        if clean_access_key:
-            headers["Authorization"] = f"Bearer {clean_access_key}"
-            # 一部の新しいAPI仕様では accessKey パラメータを要求する場合もあるため両方に対応
-            params["accessKey"] = clean_access_key
 
         with st.spinner("🌟 楽天のトレンドデータを同期中..."):
             try:
-                res = requests.get(url, params=params, headers=headers)
+                res = requests.get(url, params=params)
                 
                 if res.status_code == 200:
                     data = res.json()
