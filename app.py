@@ -47,10 +47,10 @@ st.markdown('<p class="sub-title">トレンドと欲しいモノをスマート�
 # サイドバー：認証・設定情報
 with st.sidebar:
     st.header("⚙️ システム設定")
+    # ここには元の形式のアプリケーションID（またはお持ちの通常のID）を設定します
     app_id = st.text_input("アプリケーションID", value="cd4566ea-c2e9-462d-8e63-01b1eec844b8")
-    access_key = st.text_input("アクセスキー (pk_...)", value="pk_ycMlFlKlMDuHdYC70sJ8tmBzQMaOcmjSoa6zuUJlfdV", type="password")
     affiliate_id = st.text_input("アフィリエイトID", value="104c3008.67310065.104c3009.a677faf7")
-    st.info("💡 最新の認証キーを設定済みです。")
+    st.info("💡 アプリケーションIDを入力してください。")
 
 # メイン検索エリア
 st.markdown("### 🔍 スマートアイテム検索")
@@ -62,19 +62,17 @@ with col1:
 
 if search_btn:
     clean_app_id = app_id.strip() if app_id else ""
-    clean_access_key = access_key.strip() if access_key else ""
     clean_aff_id = affiliate_id.strip() if affiliate_id else ""
     clean_keyword = keyword.strip() if keyword else ""
 
     if not clean_app_id or not clean_aff_id:
         st.warning("アプリケーションIDとアフィリエイトIDを入力してください。")
     else:
-        url = "https://app.rakuten.co.jp/services/api/IchibaItem/Search/20220601"
+        # APIのエンドポイント（最も互換性の高いバージョンに変更）
+        url = "https://app.rakuten.co.jp/services/api/IchibaItem/Search/20170428"
         
-        # 楽天の新しい仕様に合わせてパラメータに applicationId, accessKey, affiliateId をすべて渡す
         params = {
             "applicationId": clean_app_id,
-            "accessKey": clean_access_key,
             "affiliateId": clean_aff_id,
             "keyword": clean_keyword,
             "format": "json",
