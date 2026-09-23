@@ -60,15 +60,15 @@ with col1:
     search_btn = st.button("✨ カタログを生成する", use_container_width=True)
 
 if search_btn:
-    # 入力値の前後にある余分なスペースを完全に削除（400エラー対策）
     clean_app_id = app_id.strip() if app_id else ""
     clean_aff_id = affiliate_id.strip() if affiliate_id else ""
     clean_keyword = keyword.strip() if keyword else ""
 
     if not clean_app_id or not clean_aff_id:
-        st.warning("アプリケーションIDとアフィリエイトIDを確認してください。")
+        st.warning("アプリケーションIDとアフィリエイトIDを入力してください。")
     else:
-        url = "https://app.rakuten.co.jp/services/api/IchibaItem/Search/20220601"
+        # 最新のAPIエンドポイント
+        url = f"https://app.rakuten.co.jp/services/api/IchibaItem/Search/20220601"
         params = {
             "applicationId": clean_app_id,
             "affiliateId": clean_aff_id,
@@ -80,6 +80,8 @@ if search_btn:
         with st.spinner("🌟 楽天のトレンドデータを同期中..."):
             try:
                 res = requests.get(url, params=params)
+                
+                # ステータスコード200以外の場合、楽天APIからのエラー詳細を表示する
                 if res.status_code == 200:
                     data = res.json()
                     items = data.get("Items", [])
@@ -117,9 +119,15 @@ if search_btn:
                             """, unsafe_allow_html=True)
                             
                 else:
-                    st.error(f"データの取得に失敗しました（コード: {res.status_code}） - 入力されたIDやキーワードをご確認ください。")
+                    # エラーの詳細を画面に書き出す
+                    st.error(f"APIエラー (コード: {res.status_code})")
+                    try:
+                        err_json = res.json()
+                        st.code(str(err_json))
+                    except:
+                        st.text(res.text)
             except Exception as e:
-                st.error(f"通信エラーが発生しました: {e}")
+                st.error(f"通信例外エラー: {e}")
 
 # フッター
 st.markdown("---")
