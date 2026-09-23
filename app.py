@@ -3,7 +3,7 @@ import requests
 
 # ページ全体の設定
 st.set_page_config(
-    page_title="Rakuten Luxe Select | 智能ポイ活カタログ", 
+    page_title="楽天ラグジュアリーセレクト | 智能ポイ活カタログ", 
     page_icon="✨", 
     layout="centered"
 )
@@ -41,25 +41,26 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # --- ヘッダー部分 ---
-st.markdown('<p class="main-title">✨ Rakuten Luxe Select</p>', unsafe_allow_html=True)
+st.markdown('<p class="main-title">✨ 楽天ラグジュアリーセレクト</p>', unsafe_allow_html=True)
 st.markdown('<p class="sub-title">トレンドと欲しいモノをスマートに繋ぐ、次世代アフィリエイト・カタログ</p>', unsafe_allow_html=True)
 
-# サイドバー：認証・設定情報
+# サイドバー：認証・設定情報（新しく取得したIDを初期値として設定）
 with st.sidebar:
     st.header("⚙️ システム設定")
-    app_id = st.text_input("アプリケーションID", value="7e0200d6-45fe-4b28-be71-8711baaa5e7c", type="password")
+    app_id = st.text_input("アプリケーションID", value="cd4566ea-c2e9-462d-8e63-01b1eec844b8", type="password")
     affiliate_id = st.text_input("アフィリエイトID", value="104c3008.67310065.104c3009.a677faf7")
     st.info("💡 IDは安全に保持されています。")
 
 # メイン検索エリア
 st.markdown("### 🔍 スマートアイテム検索")
-keyword = st.text_input("気になるキーワードを入力してください（例：北海道 スイーツ、Xiaomi、プロテイン）", "北海道 スイーツ")
+keyword = st.text_input("「気になるキーワードを入力してください」（例：北海道スイーツ、Xiaomi、プロテイン）", "北海道 スイーツ")
 
 col1, col2 = st.columns([3, 1])
 with col1:
     search_btn = st.button("✨ カタログを生成する", use_container_width=True)
 
 if search_btn:
+    # 入力値の前後にある余分なスペースを完全に削除
     clean_app_id = app_id.strip() if app_id else ""
     clean_aff_id = affiliate_id.strip() if affiliate_id else ""
     clean_keyword = keyword.strip() if keyword else ""
@@ -68,7 +69,7 @@ if search_btn:
         st.warning("アプリケーションIDとアフィリエイトIDを入力してください。")
     else:
         # 最新のAPIエンドポイント
-        url = f"https://app.rakuten.co.jp/services/api/IchibaItem/Search/20220601"
+        url = "https://app.rakuten.co.jp/services/api/IchibaItem/Search/20220601"
         params = {
             "applicationId": clean_app_id,
             "affiliateId": clean_aff_id,
@@ -81,7 +82,6 @@ if search_btn:
             try:
                 res = requests.get(url, params=params)
                 
-                # ステータスコード200以外の場合、楽天APIからのエラー詳細を表示する
                 if res.status_code == 200:
                     data = res.json()
                     items = data.get("Items", [])
@@ -119,7 +119,6 @@ if search_btn:
                             """, unsafe_allow_html=True)
                             
                 else:
-                    # エラーの詳細を画面に書き出す
                     st.error(f"APIエラー (コード: {res.status_code})")
                     try:
                         err_json = res.json()
@@ -131,4 +130,4 @@ if search_btn:
 
 # フッター
 st.markdown("---")
-st.markdown("<p style='text-align: center; color: #aaa; font-size: 0.8rem;'>© 2026 Rakuten Luxe Select | Powered by Streamlit & Rakuten Web Service</p>", unsafe_allow_html=True)
+st.markdown("<p style='text-align: center; color: #aaa; font-size: 0.8rem;'>© 2026 楽天ラグジュアリーセレクト | Powered by Streamlit & Rakuten Web Service</p>", unsafe_allow_html=True)
