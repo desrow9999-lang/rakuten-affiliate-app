@@ -8,43 +8,59 @@ st.set_page_config(
     layout="centered"
 )
 
-# --- スタイリッシュ化のためのカスタムCSSデザイン ---
+# --- スタイリッシュ化のための洗練されたカスタムCSS ---
 st.markdown("""
 <style>
-    /* 全体のフォント・背景の雰囲気 */
+    /* 全体の背景とパディング調整 */
     .stApp {
-        background-color: #f8f9fa;
+        background-color: #f8fafc;
     }
-    /* グラデーションタイトル */
-    .main-title {
-        font-size: 1.8rem;
-        font-weight: 800;
-        background: linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #ec4899 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        margin-bottom: 0px;
-        line-height: 1.2;
+    .block-container {
+        padding-top: 2rem;
+        padding-bottom: 3rem;
     }
-    .sub-title {
-        color: #64748b;
-        font-size: 0.85rem;
+    /* カッコいいグラデーション・メインタイトル */
+    .hero-container {
+        background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #db2777 100%);
+        padding: 1.8rem 1.2rem;
+        border-radius: 16px;
+        color: white;
+        text-align: center;
         margin-bottom: 1.5rem;
+        box-shadow: 0 10px 25px -5px rgba(79, 70, 229, 0.3);
     }
-    /* カードデザイン */
-    .affiliate-card {
+    .hero-title {
+        font-size: 1.6rem;
+        font-weight: 800;
+        margin: 0;
+        color: white;
+        letter-spacing: -0.02em;
+    }
+    .hero-subtitle {
+        font-size: 0.8rem;
+        opacity: 0.9;
+        margin-top: 0.4rem;
+        margin-bottom: 0;
+    }
+    /* セクションカード */
+    .modern-card {
         background: #ffffff;
         padding: 1.2rem;
-        border-radius: 16px;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
-        margin-bottom: 1.2rem;
-        border: 1px solid #e2e8f0;
+        border-radius: 14px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+        margin-bottom: 1rem;
+        border: 1px solid #f1f5f9;
     }
 </style>
 """, unsafe_allow_html=True)
 
-# --- ヘッダー部分 ---
-st.markdown('<p class="main-title">💎 Multi-Affiliate Hub</p>', unsafe_allow_html=True)
-st.markdown('<p class="sub-title">スマートに収益リンクを生成する、次世代アフィリエイトツール</p>', unsafe_allow_html=True)
+# --- 洗練されたヒーローヘッダー ---
+st.markdown("""
+<div class="hero-container">
+    <p class="hero-title">💎 Multi-Affiliate Hub</p>
+    <p class="hero-subtitle">エラー知らず！次世代マルチリンク生成ツール</p>
+</div>
+""", unsafe_allow_html=True)
 
 # サイドバー：アフィリエイトIDの設定
 with st.sidebar:
@@ -54,10 +70,13 @@ with st.sidebar:
     st.info("💡 あなたのIDを保存しておけば、すべての生成リンクに自動で反映されます。")
 
 # メイン入力エリア
-st.markdown("### 🔍 商品の変換・リンク生成")
-input_text = st.text_input("紹介したい商品の「名前」または「通常のURL」を入力", "Xiaomi")
+st.markdown("<p style='font-weight: 700; color: #1e293b; margin-bottom: 0.5rem;'>🔍 紹介したいアイテムの入力</p>", unsafe_allow_html=True)
+input_text = st.text_input("アイテム名やURLを入力", "Xiaomi", label_visibility="collapsed", placeholder="例：北海道スイーツ、Anker、Xiaomi など")
 
-if st.button("🚀 収益リンクを一発生成する", use_container_width=True):
+st.markdown("<div style='margin-top: 1rem;'></div>", unsafe_allow_html=True)
+generate_btn = st.button("🚀 収益リンクを一発生成する", use_container_width=True)
+
+if generate_btn:
     if not input_text.strip():
         st.warning("商品名またはURLを入力してください。")
     else:
@@ -72,41 +91,40 @@ if st.button("🚀 収益リンクを一発生成する", use_container_width=Tr
         
         yahoo_link = f"https://shopping.yahoo.co.jp/search?p={encoded_query}"
 
-        st.success("✨ 各モールの収益化リンクを生成しました！")
-        st.markdown("---")
+        st.success(f"「{clean_input}」のリンクを生成しました！")
+        st.markdown("<div style='margin-top: 0.5rem;'></div>", unsafe_allow_html=True)
 
-        # スタイリッシュなカード枠でそれぞれのリンクを表示
+        # 1. 楽天市場カード
         st.markdown(f"""
-        <div class="affiliate-card">
-            <div style="font-weight: 700; color: #1e293b; margin-bottom: 8px; font-size: 1rem;">📦 対象アイテム: <span style="color: #6366f1;">{clean_input}</span></div>
-            <hr style="margin: 10px 0; border: 0; border-top: 1px solid #f1f5f9;">
-            
-            <p style="margin: 8px 0 4px 0; font-weight: 600; color: #bf0000; font-size: 0.9rem;">🛒 楽天市場（アフィリエイトリンク）</p>
+        <div class="modern-card">
+            <div style="font-weight: 700; color: #bf0000; font-size: 0.9rem; margin-bottom: 0.4rem;">🛒 楽天市場（アフィリエイト）</div>
         </div>
         """, unsafe_allow_html=True)
-        st.text_input("Rakuten Link", value=rakuten_link, key="rakuten_out", label_visibility="collapsed")
-        st.markdown(f"[👉 楽天で確認・購入する]({rakuten_link})")
+        st.text_input("Rakuten Link", value=rakuten_link, key="rak_out", label_visibility="collapsed")
+        st.markdown(f"[👉 楽天でチェックする]({rakuten_link})")
 
+        # 2. Amazonカード
         st.markdown(f"""
-        <div class="affiliate-card" style="margin-top: 15px;">
-            <p style="margin: 0 0 4px 0; font-weight: 600; color: #ff9900; font-size: 0.9rem;">📦 Amazon（検索＆アソシエイト）</p>
+        <div class="modern-card" style="margin-top: 1rem;">
+            <div style="font-weight: 700; color: #d97706; font-size: 0.9rem; margin-bottom: 0.4rem;">📦 Amazon（アソシエイト）</div>
         </div>
         """, unsafe_allow_html=True)
-        st.text_input("Amazon Link", value=amazon_link, key="amazon_out", label_visibility="collapsed")
-        st.markdown(f"[👉 Amazonで確認・購入する]({amazon_link})")
+        st.text_input("Amazon Link", value=amazon_link, key="amz_out", label_visibility="collapsed")
+        st.markdown(f"[👉 Amazonでチェックする]({amazon_link})")
 
+        # 3. Yahoo!カード
         st.markdown(f"""
-        <div class="affiliate-card" style="margin-top: 15px;">
-            <p style="margin: 0 0 4px 0; font-weight: 600; color: #ff0033; font-size: 0.9rem;">🛍️ Yahoo!ショッピング</p>
+        <div class="modern-card" style="margin-top: 1rem;">
+            <div style="font-weight: 700; color: #e11d48; font-size: 0.9rem; margin-bottom: 0.4rem;">🛍️ Yahoo!ショッピング</div>
         </div>
         """, unsafe_allow_html=True)
-        st.text_input("Yahoo Link", value=yahoo_link, key="yahoo_out", label_visibility="collapsed")
-        st.markdown(f"[👉 Yahoo!で確認・購入する]({yahoo_link})")
+        st.text_input("Yahoo Link", value=yahoo_link, key="yah_out", label_visibility="collapsed")
+        st.markdown(f"[👉 Yahoo!でチェックする]({yahoo_link})")
         
         st.markdown("---")
 
         # SNSやブログ用のまとめテキスト
-        st.markdown("### ✍️ SNS・ブログ用コピペ文面")
+        st.markdown("<p style='font-weight: 700; color: #1e293b;'>✍️ SNS・ブログ用コピペ文面</p>", unsafe_allow_html=True)
         share_text = f"""＼ 今日のイチオシ！ ／
 {clean_input} をチェック✨
 
@@ -119,8 +137,8 @@ if st.button("🚀 収益リンクを一発生成する", use_container_width=Tr
 ▼ Yahoo!ショッピングはこちら
 {yahoo_link}
 """
-        st.text_area("以下の文章をコピーしてSNSやブログに貼り付けられます", share_text, height=150)
+        st.text_area("コピペ用テキスト", share_text, height=140, label_visibility="collapsed")
 
 # フッター
 st.markdown("---")
-st.markdown("<p style='text-align: center; color: #94a3b8; font-size: 0.8rem;'>© 2026 Multi-Affiliate Hub | Powered by Streamlit</p>", unsafe_allow_html=True)
+st.markdown("<p style='text-align: center; color: #94a3b8; font-size: 0.75rem;'>© 2026 Multi-Affiliate Hub</p>", unsafe_allow_html=True)
